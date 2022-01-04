@@ -77,3 +77,44 @@ label var treatment_phase "Intervention phase"
 lab define treatment 1"Treated" 0"Control"
 lab val treatment treatment
 
+******* II. Descriptive Statistics 
+
+*9 Average
+foreach x in total male female {
+gen `x'_tr = turnout_`x'/registered_`x' * 100
+}
+
+sum total_tr
+
+scalar average_turnout_rate = r(mean)
+scalar min_turnout_rate = r(min)
+scalar max_turnout_rate = r(max)
+
+count if total_tr==100  //there are 20 polling booths with full electoral participation
+
+*10
+bysort treatment_phase: tab treatment
+
+*11 
+egen turnout_district = total(turnout_total), by(district)
+egen registered_district = total(registered_total), by(district)
+gen district_turnout_rate= turnout_district/registered_district * 100
+
+egen turnout_district_female = total(turnout_female), by(district)
+egen registered_district_female = total(registered_male), by(district)
+gen district_turnout_rate_female= turnout_district/registered_district * 100
+
+tabstat district_turnout_rate_female if district_turnout_rate>=75, by (district)
+// There aren't observations because neither district has turnout over or equal 75%
+
+*12
+ttest female_tr, by(treatment)
+//Acording to the test on the equality of means, the means are significantly different from each other at the 95% confidence level.
+*Given the fact that female turnout is a dummy (from 0 to 1), the ttest can give a good approximation of the difference between proportions. 
+
+*13
+histogram turnout_total, freq  by (treatment)
+graph export "$graphics/Graph_total turnout.pdf", replace
+histogram turnout_female, freq  by (treatment)
+graph export "$graphics/Graph_female turnout.pdf", replace
+
