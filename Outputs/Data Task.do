@@ -120,7 +120,7 @@ graph export "$graphics/Graph_total turnout.pdf", replace
 histogram turnout_female, freq  by (treatment)
 graph export "$graphics/Graph_female turnout.pdf", replace
 
-******* III. Regression
+******** III. Regression
 *14
 reg turnout_total treatment i.town_id registered_total
 outreg2 using "$outputs/s3p14.doc", label  bdec(3) sdec(3) drop(i.town_id) nor2 ///
@@ -147,3 +147,15 @@ scalar list change_var //the change was 1.8%
 *The treatment had a positive  effect on the total turnout, specifically, the treatment increase  8.4 votes on average compared to the control group.
 *This effect is stadistically significant at the 95% confidence level.
 
+*********** IV Instrumental variables
+
+*19 
+* The variable that satisfies the relevance condition and exogeneity is is take_up. This two conditions assure a good instrumental variable.
+
+*20
+reg treatment take_up i.town_id registered_total // relevant condition assumption indicates that instrument be a good predictor of endogenous variable. In this case, take_up is a good predictor of treatment. Also, the F-stat is higher than 10. 
+*Source: Beltran & Castro (2010) Modelos de datos de panel y variables dependientes limitadas:teoria y practica. Universidad del Pacifico
+
+*22
+ivregress 2sls turnout_total i.town_id registered_total (treatment = take_up)
+** The treatment coefficient has reduced in almost  2 votes and it is no longer stadistically significant. 
