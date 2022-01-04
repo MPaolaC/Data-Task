@@ -1,0 +1,14 @@
+		(1)
+VARIABLES	LABELS	Electoral data total turnout
+		
+treatment	Intervention	8.401**
+		(3.487)
+registered_total	Electoral data total registered	0.058***
+		(0.004)
+Constant	Constant	337.636***
+		(9.714)
+		
+Observations		6,948
+Town dummies		Yes
+Standard errors in parentheses		
+*** p<0.01, ** p<0.05, * p<0.1		

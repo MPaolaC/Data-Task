@@ -16,6 +16,8 @@ global data     "$ruta/Data"
 
 
 *** I. Data Cleaning
+clear all
+set more off
 
 * 1. Import the data
 import excel "/$data/Data for Analysis Test.xlsx", sheet("Sheet1") firstrow
@@ -117,4 +119,31 @@ histogram turnout_total, freq  by (treatment)
 graph export "$graphics/Graph_total turnout.pdf", replace
 histogram turnout_female, freq  by (treatment)
 graph export "$graphics/Graph_female turnout.pdf", replace
+
+******* III. Regression
+*14
+reg turnout_total treatment i.town_id registered_total
+outreg2 using "$outputs/s3p14.doc", label  bdec(3) sdec(3) drop(i.town_id) nor2 ///
+addtext(Town dummies, Yes) replace
+
+*15
+sum turnout_total if treatment==0 & e(sample)
+scalar mean_control = r(mean)
+
+*16
+reg turnout_total treatment i.town_id registered_total
+mat coef=e(b)
+scalar treat_effect = coef[1,1]
+
+*17
+sum turnout_total if treatment==1 & e(sample)
+
+scalar mean_treated = r(mean)
+scalar change_var = treat_effect/mean_treated * 100 
+
+scalar list change_var //the change was 1.8%
+
+*18
+*The treatment had a positive  effect on the total turnout, specifically, the treatment increase  8.4 votes on average compared to the control group.
+*This effect is stadistically significant at the 95% confidence level.
 
